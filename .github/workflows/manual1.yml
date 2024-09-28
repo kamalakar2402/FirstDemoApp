@@ -1,0 +1,329 @@
+#Please consider modifying the workflow as per your environments and needs.
+#Deployment flow in this workflow: dev -> qa approval -> qa -> uat approval -> uat -> prod approval -> prod
+# When the akamai properties are ready, make sure to enable BGDAUTO=true and update the right values in uat & prod placeholders. Currently it is false: https://github.com/sfdc-www/mulesoft/settings/variables/actions.
+name: run-release-workflow
+on:
+  # Needs to run on-demand basis with domain name as input parameter
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain Name'
+        required: true
+
+env:
+  CACHE_VERSION:'lk'
+  GH_TOKEN: 'lk'
+  HEROKU_API_KEY: 
+  HEROKU_EMAIL: 'lk'
+  PROD_ORIGIN1: 'lk'
+  PROD_ORIGIN2: 'lk'
+  UAT_ORIGIN1: 'lk'
+  UAT_ORIGIN2: 'lk'
+  HFX_ORIGIN1: 'lk'
+  HFX_ORIGIN2: 'lk' 
+  GIT_AUTHOR_EMAIL: 'lk'
+  GIT_AUTHOR_NAME: 'lk'
+  BGDAUTO: 'lk'
+  akamai_access_token: 'lk'
+  akamai_client_secret: 'lk'
+  akamai_client_token: 'lk'
+  akamai_host: 'lk'
+  SLACK_WEBHOOK: 'lk'
+  SLACK_DEFAULT_CHANNEL: 'lk'
+
+jobs:
+  #deploy-code-to-dev:
+  #      if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && startsWith(github.event.release.name, 'v')
+  #      runs-on: sfdc-www-ubuntu
+  #      steps:
+  #      - uses: sfdc-www/checkout@v2
+  #        with:
+  #          fetch-depth: 0
+  #          token: ${{ env.GH_TOKEN }}
+  #      - uses: "./.github/actions/deploy-to-heroku"
+  #        with:
+  #          env: dev
+  #      - uses: sfdc-www/action-slack-notify@v2
+  #        continue-on-error: true
+  #        if: failure()
+  #        env:
+  #          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+  #          SLACK_CHANNEL: ${{ env.SLACK_DEFAULT_CHANNEL }}
+  #          SLACK_COLOR: '#ff0000'
+  #          MSG_MINIMAL: true
+  #          SLACK_TITLE: " FAILED :red_circle: "
+  #          SLACK_MESSAGE: " \nJOB: ${{ github.job }} \nAUTHOR: ${{ github.actor }} \nBRANCH: ${{ github.ref }}\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|Review your changes>"
+  #  deploy-code-to-dev-prev:
+  #    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && startsWith(github.event.release.name, 'v')
+  #    runs-on: sfdc-www-ubuntu
+  #    steps:
+  #    - uses: sfdc-www/checkout@v2
+  #      with:
+  #        fetch-depth: 0
+  #        token: ${{ env.GH_TOKEN }}
+  #    - uses: "./.github/actions/deploy-to-heroku"
+  #      with:
+  #        env: dev-prev
+  #    - uses: sfdc-www/action-slack-notify@v2
+  #      continue-on-error: true
+  #      if: failure()
+  #      env:
+  #        SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+  #        SLACK_CHANNEL: ${{ env.SLACK_DEFAULT_CHANNEL }}
+  #        SLACK_COLOR: '#ff0000'
+  #        MSG_MINIMAL: true
+  #        SLACK_TITLE: " FAILED :red_circle: "
+  #        SLACK_MESSAGE: " \nJOB: ${{ github.job }} \nAUTHOR: ${{ github.actor }} \nBRANCH: ${{ github.ref }}\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|Review your changes>"
+  #        SLACK_FOOTER: ""
+  #  git-tag-dev:
+  #    runs-on: sfdc-www-ubuntu
+  #    needs:
+  #      - deploy-code-to-dev
+  #      - deploy-code-to-dev-prev
+  #    steps:
+  #      - uses: sfdc-www/checkout@v2
+  #        with:
+  #          fetch-depth: 0
+  #          token: ${{ env.GH_TOKEN }}
+  #      - uses: './.github/actions/git-tag'
+  #        with:
+  #          tag: dev
+  #      - uses: sfdc-www/action-slack-notify@v2
+  #        continue-on-error: true
+  #        if: failure()
+  #        env:
+  #          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+  #          SLACK_CHANNEL: ${{ env.SLACK_DEFAULT_CHANNEL }}
+  #          SLACK_COLOR: '#ff0000'
+  #          MSG_MINIMAL: true
+  #          SLACK_TITLE: ' FAILED :red_circle: '
+  #          SLACK_MESSAGE: " \nJOB: ${{ github.job }} \nAUTHOR: ${{ github.actor }} \nBRANCH: ${{ github.ref }}\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|Review your changes>"
+  #          SLACK_FOOTER: ''
+  #  release-to-qa-approval:
+  #    environment:
+  #      name: qa
+  #    runs-on: sfdc-www-ubuntu
+  #    needs:
+  #      - git-tag-dev
+  #    steps:
+  #      - run: echo 'approved'
+  #  deploy-code-to-qa:
+  #      runs-on: sfdc-www-ubuntu
+  #      needs:
+  #        - release-to-qa-approval
+  #      steps:
+  #      - uses: sfdc-www/checkout@v2
+  #        with:
+  #          fetch-depth: 0
+  #          token: ${{ env.GH_TOKEN }}
+  #      - uses: './.github/actions/heroku-slug-promotion'
+  #        with:
+  #          source: dev
+  #          destination: qa
+  #      - uses: sfdc-www/action-slack-notify@v2
+  #        continue-on-error: true
+  #        if: failure()
+  #        env:
+  #          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+  #          SLACK_CHANNEL: ${{ env.SLACK_DEFAULT_CHANNEL }}
+  #          SLACK_COLOR: '#ff0000'
+  #          MSG_MINIMAL: true
+  #          SLACK_TITLE: " FAILED :red_circle: "
+  #          SLACK_MESSAGE: " \nJOB: ${{ github.job }} \nAUTHOR: ${{ github.actor }} \nBRANCH: ${{ github.ref }}\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|Review your changes>"
+  #  deploy-code-to-qa-prev:
+  #    runs-on: sfdc-www-ubuntu
+  #    needs:
+  #      - release-to-qa-approval
+  #    steps:
+  #      - uses: sfdc-www/checkout@v2
+  #        with:
+  #          fetch-depth: 0
+  #          token: ${{ env.GH_TOKEN }}
+  #      - uses: './.github/actions/heroku-slug-promotion'
+  #        with:
+  #          source: dev-prev
+  #          destination: qa-prev
+  #      - uses: sfdc-www/action-slack-notify@v2
+  #        continue-on-error: true
+  #        if: failure()
+  #        env:
+  #          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+  #          SLACK_CHANNEL: ${{ env.SLACK_DEFAULT_CHANNEL }}
+  #          SLACK_COLOR: '#ff0000'
+  #          MSG_MINIMAL: true
+  #          SLACK_TITLE: ' FAILED :red_circle: '
+  #          SLACK_MESSAGE: " \nJOB: ${{ github.job }} \nAUTHOR: ${{ github.actor }} \nBRANCH: ${{ github.ref }}\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|Review your changes>"
+  #  git-tag-qa:
+  #    runs-on: sfdc-www-ubuntu
+  #    needs:
+  #      - deploy-code-to-qa
+  #      - deploy-code-to-qa-prev
+  #    steps:
+  #      - uses: sfdc-www/checkout@v2
+  #        with:
+  #          fetch-depth: 0
+  #          token: ${{ env.GH_TOKEN }}
+  #      - uses: './.github/actions/git-tag'
+  #        with:
+  #          tag: qa
+  #      - uses: sfdc-www/action-slack-notify@v2
+  #        continue-on-error: true
+  #        if: failure()
+  #        env:
+  #          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
+  #          SLACK_CHANNEL: ${{ env.SLACK_DEFAULT_CHANNEL }}
+  #          SLACK_COLOR: '#ff0000'
+  #          MSG_MINIMAL: true
+  #          SLACK_TITLE: ' FAILED :red_circle: '
+  #          SLACK_MESSAGE: " \nJOB: ${{ github.job }} \nAUTHOR: ${{ github.actor }} \nBRANCH: ${{ github.ref }}\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|Review your changes>"
+  #          SLACK_FOOTER: ''
+  release-to-uat-approval:
+    environment:
+      name: uat
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'approved'
+  gtm-traffic-disable-uat-origin1:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello1'
+
+  gtm-traffic-validate-uat-origin2:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello2' 
+  deploy-code-to-uat-preview:
+      
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello3' 
+  #e2e-smoke-tests-uat-origin1:
+  #  runs-on: sfdc-www-ubuntu
+  #  container:
+  #    image: mcr.microsoft.com/playwright:v1.43.1-jammy
+ #     env:
+#        NODE_ENV: development
+ #   needs:
+ #   - deploy-code-to-uat
+  #  - deploy-code-to-uat-preview
+ #   steps:
+  #  - uses: sfdc-www/checkout@v2
+    # 'actions/run-e2e-tests' needs to be updated by team's e2e steps/values
+    # - name: Run E2E Smoke Tests After UAT Release on Origin1 (Virginia)
+    #   uses: "./.github/actions/run-e2e-tests"
+    #   with:
+    #     host: https://www-uat1.salesforce.com
+    #     script: e2e:smoke
+    #     headers: test-uat:TargetOrigin1
+  purge-cache-uat-cpcode:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello4' 
+  gtm-traffic-enable-uat-origin1:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello5' 
+  gtm-traffic-disable-uat-origin2:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello6' 
+  gtm-traffic-validate-uat-origin1:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello7' 
+  deploy-code-to-uat-dr-preview:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello8' 
+    
+ # e2e-smoke-tests-uat-origin2:
+ #   runs-on: sfdc-www-ubuntu
+ #   container:
+  #    image: mcr.microsoft.com/playwright:v1.43.1-jammy
+ #     env:
+  #      NODE_ENV: development
+  #  needs:
+  #  - deploy-code-to-uat-dr
+  #  - deploy-code-to-uat-dr-preview
+ #   steps:
+ #   - uses: sfdc-www/checkout@v2
+    # 'actions/run-e2e-tests' needs to be updated by team's e2e steps/values
+    # - name: Run E2E Smoke Tests After UAT Release on Origin2 (Oregon)
+    #   uses: "./.github/actions/run-e2e-tests"
+    #   with:
+    #     host: https://www-uat1.salesforce.com
+    #     script: e2e:smoke
+    #     headers: test-uat:TargetOrigin2
+
+  purge-cache-uat-cpcode-again:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello2' 
+  gtm-traffic-enable-uat-origin2:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello2' 
+  gtm-traffic-validate-uat-origins:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello2' 
+  uat-git-hash-check:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello2' 
+  git-tag-uat:
+     runs-on: ubuntu-latest
+    container:
+      image: python:3.8
+    needs:
+    - release-to-uat-approval
+    steps:
+    - run: echo 'hello2' 
