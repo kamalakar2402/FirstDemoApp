@@ -200,8 +200,7 @@ jobs:
     steps:
     - run: echo 'hello2' 
   deploy-code-to-uat-preview:
-      
-     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     container:
       image: python:3.8
     needs:
@@ -228,44 +227,44 @@ jobs:
     #     headers: test-uat:TargetOrigin1
   purge-cache-uat-cpcode:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello4' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello4' 
   gtm-traffic-enable-uat-origin1:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello5' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello5' 
   gtm-traffic-disable-uat-origin2:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello6' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello6' 
   gtm-traffic-validate-uat-origin1:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello7' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello7' 
   deploy-code-to-uat-dr-preview:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello8' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello8' 
     
  # e2e-smoke-tests-uat-origin2:
  #   runs-on: sfdc-www-ubuntu
@@ -291,38 +290,38 @@ jobs:
     container:
       image: python:3.8
     needs:
-    - release-to-uat-approval
+     - release-to-uat-approval
     steps:
-    - run: echo 'hello2' 
+     - run: echo 'hello2' 
   gtm-traffic-enable-uat-origin2:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello2' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello2' 
   gtm-traffic-validate-uat-origins:
     runs-on: ubuntu-latest
     container:
       image: python:3.8
     needs:
-    - release-to-uat-approval
+     - release-to-uat-approval
     steps:
-    - run: echo 'hello2' 
+     - run: echo 'hello2' 
   uat-git-hash-check:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello2' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello2' 
   git-tag-uat:
      runs-on: ubuntu-latest
-    container:
+     container:
       image: python:3.8
-    needs:
-    - release-to-uat-approval
-    steps:
-    - run: echo 'hello2' 
+     needs:
+     - release-to-uat-approval
+     steps:
+     - run: echo 'hello2' 
