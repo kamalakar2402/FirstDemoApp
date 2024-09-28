@@ -13,7 +13,7 @@ on:
 env:
   CACHE_VERSION:'lk'
   GH_TOKEN: 'lk'
-  HEROKU_API_KEY: 
+  HEROKU_API_KEY: 'lk'
   HEROKU_EMAIL: 'lk'
   PROD_ORIGIN1: 'lk'
   PROD_ORIGIN2: 'lk'
