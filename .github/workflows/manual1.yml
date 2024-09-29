@@ -24,14 +24,13 @@ jobs:
     needs:
     - release-to-uat-approval
     steps:
-    - run: echo 'hello1'
-
+    - run: echo 'gtm-traffic-disable-uat-origin1'
   gtm-traffic-validate-uat-origin2:
     runs-on: ubuntu-latest
     container:
       image: python:3.8
     needs:
-    - release-to-uat-approval
+    - gtm-traffic-disable-uat-origin1
     steps:
     - run: echo 'hello2' 
   deploy-code-to-uat-preview:
@@ -39,7 +38,7 @@ jobs:
     container:
       image: python:3.8
     needs:
-    - release-to-uat-approval
+    - rgtm-traffic-validate-uat-origin2
     steps:
     - run: echo 'hello3' 
   #e2e-smoke-tests-uat-origin1:
@@ -65,7 +64,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - deploy-code-to-uat-preview
      steps:
      - run: echo 'hello4' 
   gtm-traffic-enable-uat-origin1:
@@ -73,7 +72,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - purge-cache-uat-cpcode
      steps:
      - run: echo 'hello5' 
   gtm-traffic-disable-uat-origin2:
@@ -81,7 +80,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - gtm-traffic-enable-uat-origin1
      steps:
      - run: echo 'hello6' 
   gtm-traffic-validate-uat-origin1:
@@ -89,7 +88,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - gtm-traffic-disable-uat-origin2
      steps:
      - run: echo 'hello7' 
   deploy-code-to-uat-dr-preview:
@@ -97,7 +96,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - gtm-traffic-validate-uat-origin1
      steps:
      - run: echo 'hello8' 
     
@@ -125,7 +124,7 @@ jobs:
     container:
       image: python:3.8
     needs:
-     - release-to-uat-approval
+     - deploy-code-to-uat-dr-preview
     steps:
      - run: echo 'hello2' 
   gtm-traffic-enable-uat-origin2:
@@ -133,7 +132,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - purge-cache-uat-cpcode-again
      steps:
      - run: echo 'hello2' 
   gtm-traffic-validate-uat-origins:
@@ -141,7 +140,7 @@ jobs:
     container:
       image: python:3.8
     needs:
-     - release-to-uat-approval
+     - gtm-traffic-enable-uat-origin2
     steps:
      - run: echo 'hello2' 
   uat-git-hash-check:
@@ -149,7 +148,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - tm-traffic-validate-uat-origins
      steps:
      - run: echo 'hello2' 
   git-tag-uat:
@@ -157,6 +156,6 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - release-to-uat-approval
+     - uat-git-hash-check
      steps:
      - run: echo 'hello2' 
