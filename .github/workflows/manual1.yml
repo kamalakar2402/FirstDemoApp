@@ -148,7 +148,7 @@ jobs:
      container:
       image: python:3.8
      needs:
-     - tm-traffic-validate-uat-origins
+     - gtm-traffic-validate-uat-origins
      steps:
      - run: echo 'hello2' 
   git-tag-uat:
