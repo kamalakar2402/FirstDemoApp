@@ -38,7 +38,7 @@ jobs:
     container:
       image: python:3.8
     needs:
-    - rgtm-traffic-validate-uat-origin2
+    - gtm-traffic-validate-uat-origin2
     steps:
     - run: echo 'hello3' 
   #e2e-smoke-tests-uat-origin1:
