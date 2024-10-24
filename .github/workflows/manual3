@@ -1,0 +1,88 @@
+on:
+  # Needs to run on-demand basis with domain name as input parameter
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain Name'
+        required: true
+jobs:
+  deploy-to-uat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to UAT
+        run: echo "Deploy to UAT environment"
+  release-to-uat-approval:
+    environment:
+      name: uat #Create this environment in your repository with required reviewer
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-to-uat
+    steps:
+      - run: echo 'approved'
+  deploy-code-to-content-svc-uat:
+    runs-on: ubuntu-latest
+    needs:
+      - release-to-uat-approval
+    steps:
+     - run: echo 'release-to-uat-approval'
+  deploy-code-to-evnt-exp-uat:
+    #if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && !contains(github.ref_name, 'hotfix') && startsWith(github.event.release.name, 'v')
+    runs-on: ubuntu-latest
+    needs:
+      - release-to-uat-approval
+    steps:
+     - run: echo 'deploy-code-to-evnt-exp-uat'
+      
+  deploy-code-to-data-migr-uat:
+   # if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && !contains(github.ref_name, 'hotfix') && startsWith(github.event.release.name, 'v')
+    runs-on: ubuntu-latest
+    needs:
+      - release-to-uat-approval
+    steps:
+      - run: echo 'deploy-code-to-data-migr-uat'
+  deploy-to-udr:
+    runs-on: ubuntu-latest
+    needs:
+        - deploy-code-to-content-svc-uat
+        - deploy-code-to-evnt-exp-uat
+        - deploy-code-to-data-migr-uat
+    steps:
+      - name: Deploy to UDR
+        run: echo "Deploy to UAT environment"
+  release-to-udr-approval:
+    environment:
+      name: uat #Create this environment in your repository with required reviewer
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-to-udr
+    steps:
+      - run: echo 'approved'
+  deploy-code-to-content-svc-udr:
+    runs-on: ubuntu-latest
+    needs:
+      - release-to-udr-approval
+    steps:
+      - run: echo 'deploy-code-to-content-svc-udr'
+  deploy-code-to-evnt-exp-udr:
+    #if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && !contains(github.ref_name, 'hotfix') && startsWith(github.event.release.name, 'v')
+    runs-on: ubuntu-latest
+    needs:
+      - release-to-udr-approval
+    steps:
+      - run: echo 'deploy-code-to-evnt-exp-udr'
+  deploy-code-to-data-migr-udr:
+   # if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && !contains(github.ref_name, 'hotfix') && startsWith(github.event.release.name, 'v')
+    runs-on: ubuntu-latest
+    needs:
+      - release-to-udr-approval
+    steps:
+      steps:
+      - run: echo 'deploy-code-to-data-migr-udr'
+  git-tag-uat:
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-code-to-content-svc-udr
+      - deploy-code-to-evnt-exp-udr
+      - deploy-code-to-data-migr-udr
+    steps:
+     - run: echo 'deploy-code-to-data-migr-udr'
